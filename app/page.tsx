@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client"
 
 import Image from "next/image"
@@ -8,10 +7,17 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Leaf, Calendar, BookOpen, BarChart3, Map, Target, Zap, Shield } from "lucide-react"
 import { useEffect, useState } from 'react'
 
+// Agregar esta interfaz para el tipo User
+interface User {
+  name: string;
+  farm?: string;
+  // puedes agregar más propiedades según necesites
+}
+
 export default function Home() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null) // ← CORREGIDO AQUÍ
 
   useEffect(() => {
     // Verificar si el usuario está autenticado
@@ -37,6 +43,7 @@ export default function Home() {
     }
   }, [router])
 
+  // ... el resto del código se mantiene igual ...
   // Mostrar loading mientras verifica la autenticación
   if (isLoading) {
     return (
