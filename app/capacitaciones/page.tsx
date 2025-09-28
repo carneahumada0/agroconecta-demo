@@ -8,18 +8,39 @@ import BackButton from "@/components/BackButton"
 import Image from "next/image"
 import { 
   BookOpen, Video, FileText, Headphones, Download, 
-  Award, Users, Search, Filter, Play, Clock,
-  CheckCircle, Star, Plus, Eye, Share2, Bookmark
+  Award, Users, Search, Play, Clock,
+  CheckCircle, Star, Plus, Eye
 } from "lucide-react"
 
+interface Capacitacion {
+  id: string
+  tema: string
+  fecha: string
+  enlace: string
+  tipo: string
+  duracion: string
+  nivel: string
+  descripcion: string
+  categorias: string[]
+  completado: boolean
+  puntuacion: number
+}
+
+interface Recomendacion {
+  id: string
+  tema: string
+  tipo: string
+  razon: string
+  prioridad: string
+}
+
 export default function Capacitaciones() {
-  const [capacitaciones, setCapacitaciones] = useState([])
+  const [capacitaciones, setCapacitaciones] = useState<Capacitacion[]>([])
   const [form, setForm] = useState({ tema: "", fecha: "", enlace: "", tipo: "video" })
   const [filtro, setFiltro] = useState('todos')
   const [busqueda, setBusqueda] = useState('')
-  const [progreso, setProgreso] = useState({})
-  const [descargas, setDescargas] = useState({})
-  const [cultivosUsuario, setCultivosUsuario] = useState([])
+  const [descargas, setDescargas] = useState<Record<string, boolean>>({})
+  const [cultivosUsuario, setCultivosUsuario] = useState<string[]>([])
 
   // Cargar datos al iniciar
   useEffect(() => {
@@ -75,7 +96,7 @@ export default function Capacitaciones() {
 
     if (cultivosGuardados) {
       const cultivos = JSON.parse(cultivosGuardados)
-      setCultivosUsuario(cultivos.map(c => c.tipo?.toLowerCase() || ''))
+      setCultivosUsuario(cultivos.map((c: any) => c.tipo?.toLowerCase() || ''))
     }
   }, [])
 
@@ -84,13 +105,13 @@ export default function Capacitaciones() {
     localStorage.setItem('capacitaciones', JSON.stringify(capacitaciones))
   }, [capacitaciones])
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
   const handleAdd = () => {
     if (form.tema && form.fecha && form.enlace) {
-      const nuevaCapacitacion = {
+      const nuevaCapacitacion: Capacitacion = {
         id: Date.now().toString(),
         tema: form.tema,
         fecha: form.fecha,
@@ -109,19 +130,19 @@ export default function Capacitaciones() {
     }
   }
 
-  const marcarCompletado = (id) => {
+  const marcarCompletado = (id: string) => {
     setCapacitaciones(capacitaciones.map(c => 
       c.id === id ? { ...c, completado: true } : c
     ))
   }
 
-  const calificarCapacitacion = (id, puntuacion) => {
+  const calificarCapacitacion = (id: string, puntuacion: number) => {
     setCapacitaciones(capacitaciones.map(c => 
       c.id === id ? { ...c, puntuacion } : c
     ))
   }
 
-  const toggleDescarga = (id) => {
+  const toggleDescarga = (id: string) => {
     setDescargas(prev => ({
       ...prev,
       [id]: !prev[id]
@@ -129,8 +150,8 @@ export default function Capacitaciones() {
   }
 
   // Generar recomendaciones basadas en cultivos del usuario
-  const generarRecomendaciones = () => {
-    const recomendaciones = []
+  const generarRecomendaciones = (): Recomendacion[] => {
+    const recomendaciones: Recomendacion[] = []
     
     if (cultivosUsuario.includes('maíz') || cultivosUsuario.includes('cereal')) {
       recomendaciones.push({
@@ -201,7 +222,7 @@ export default function Capacitaciones() {
       (capacitaciones.filter(c => c.completado).length / capacitaciones.length * 100).toFixed(1) : 0
   }
 
-  const getIconoTipo = (tipo) => {
+  const getIconoTipo = (tipo: string) => {
     switch (tipo) {
       case 'video': return <Video className="h-5 w-5" />
       case 'pdf': return <FileText className="h-5 w-5" />
@@ -210,7 +231,7 @@ export default function Capacitaciones() {
     }
   }
 
-  const getColorTipo = (tipo) => {
+  const getColorTipo = (tipo: string) => {
     switch (tipo) {
       case 'video': return 'bg-red-100 text-red-700'
       case 'pdf': return 'bg-blue-100 text-blue-700'
