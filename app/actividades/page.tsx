@@ -8,13 +8,31 @@ import BackButton from "@/components/BackButton"
 import Image from "next/image"
 import { 
   Calendar, Clock, User, DollarSign, Camera, 
-  Play, Square, Plus, Search, Filter, 
-  BarChart3, CheckCircle, AlertTriangle, 
-  Edit3, Trash2, Users, Target, ChevronLeft, ChevronRight
+  Play, Square, Plus, Search, 
+  Edit3, Trash2, Users, ChevronLeft, ChevronRight
 } from "lucide-react"
 
+interface Actividad {
+  id: string
+  tarea: string
+  fecha: string
+  fechaFin: string
+  responsable: string
+  estado: string
+  prioridad: string
+  costoEstimado: number
+  costoReal: number
+  descripcion: string
+  equipo: string
+  tiempoEstimado: number
+  tiempoReal: number
+  evidencias: string[]
+  notas: string[]
+  fechaCreacion: string
+}
+
 export default function Actividades() {
-  const [actividades, setActividades] = useState([])
+  const [actividades, setActividades] = useState<Actividad[]>([])
   const [form, setForm] = useState({ 
     tarea: "", 
     fecha: "", 
@@ -29,17 +47,15 @@ export default function Actividades() {
   
   const [filtro, setFiltro] = useState('todas')
   const [busqueda, setBusqueda] = useState('')
-  const [editandoId, setEditandoId] = useState(null)
-  const [actividadEnCurso, setActividadEnCurso] = useState(null)
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [actividadEnCurso, setActividadEnCurso] = useState<string | null>(null)
   const [tiempoTranscurrido, setTiempoTranscurrido] = useState(0)
-  const [costoReal, setCostoReal] = useState({})
-  const [evidencias, setEvidencias] = useState({})
   const [vistaCalendario, setVistaCalendario] = useState(false)
   const [fechaCalendario, setFechaCalendario] = useState(new Date())
-  const intervalRef = useRef(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Timer functions
-  const iniciarTimer = (id) => {
+  const iniciarTimer = (id: string) => {
     if (actividadEnCurso && actividadEnCurso !== id) {
       alert('Ya hay una actividad en curso. Deténla primero.')
       return
@@ -53,7 +69,7 @@ export default function Actividades() {
     }, 1000)
   }
 
-  const detenerTimer = (id) => {
+  const detenerTimer = (id: string) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
@@ -77,7 +93,7 @@ export default function Actividades() {
     setTiempoTranscurrido(0)
   }
 
-  const formatearTiempo = (segundos) => {
+  const formatearTiempo = (segundos: number) => {
     const horas = Math.floor(segundos / 3600)
     const minutos = Math.floor((segundos % 3600) / 60)
     const segs = segundos % 60
@@ -85,7 +101,7 @@ export default function Actividades() {
   }
 
   // Funciones del Calendario
-  const cambiarMes = (direccion) => {
+  const cambiarMes = (direccion: number) => {
     setFechaCalendario(prev => {
       const nuevoMes = new Date(prev)
       nuevoMes.setMonth(prev.getMonth() + direccion)
@@ -93,10 +109,9 @@ export default function Actividades() {
     })
   }
 
-  const obtenerDiasDelMes = (fecha) => {
+  const obtenerDiasDelMes = (fecha: Date) => {
     const año = fecha.getFullYear()
     const mes = fecha.getMonth()
-    const primerDia = new Date(año, mes, 1)
     const ultimoDia = new Date(año, mes + 1, 0)
     const diasEnMes = ultimoDia.getDate()
     
@@ -108,19 +123,15 @@ export default function Actividades() {
     return dias
   }
 
-  const obtenerActividadesDelDia = (fecha) => {
+  const obtenerActividadesDelDia = (fecha: Date) => {
     return actividades.filter(actividad => {
       const fechaActividad = new Date(actividad.fecha)
       return fechaActividad.toDateString() === fecha.toDateString()
     })
   }
 
-  const obtenerNombreMes = (fecha) => {
+  const obtenerNombreMes = (fecha: Date) => {
     return fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
-  }
-
-  const obtenerNombreDia = (fecha) => {
-    return fecha.toLocaleDateString('es-ES', { weekday: 'short' })
   }
 
   // Cargar actividades al iniciar
@@ -136,13 +147,13 @@ export default function Actividades() {
     localStorage.setItem('actividades', JSON.stringify(actividades))
   }, [actividades])
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
   const handleAdd = () => {
     if (form.tarea && form.fecha && form.responsable) {
-      const nuevaActividad = {
+      const nuevaActividad: Actividad = {
         id: Date.now().toString(),
         tarea: form.tarea,
         fecha: form.fecha,
@@ -176,7 +187,7 @@ export default function Actividades() {
     }
   }
 
-  const handleEdit = (actividad) => {
+  const handleEdit = (actividad: Actividad) => {
     setForm({
       tarea: actividad.tarea,
       fecha: actividad.fecha,
@@ -217,11 +228,11 @@ export default function Actividades() {
     }
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     setActividades(actividades.filter(a => a.id !== id))
   }
 
-  const cambiarEstado = (id, nuevoEstado) => {
+  const cambiarEstado = (id: string, nuevoEstado: string) => {
     setActividades(actividades.map(a => 
       a.id === id 
         ? { 
@@ -233,7 +244,7 @@ export default function Actividades() {
     ))
   }
 
-  const agregarCostoReal = (id, costo) => {
+  const agregarCostoReal = (id: string, costo: string) => {
     const costoNum = parseFloat(costo)
     if (!isNaN(costoNum)) {
       setActividades(actividades.map(a => 
@@ -248,7 +259,7 @@ export default function Actividades() {
     }
   }
 
-  const agregarEvidencia = (id, archivo) => {
+  const agregarEvidencia = (id: string, archivo: File) => {
     if (archivo) {
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -256,7 +267,7 @@ export default function Actividades() {
           a.id === id 
             ? { 
                 ...a, 
-                evidencias: [...a.evidencias, e.target.result],
+                evidencias: [...a.evidencias, e.target?.result as string],
                 notas: [...a.notas, 'Evidencia fotográfica agregada']
               }
             : a
@@ -266,7 +277,7 @@ export default function Actividades() {
     }
   }
 
-  const agregarNota = (id, nota) => {
+  const agregarNota = (id: string, nota: string) => {
     if (nota.trim()) {
       setActividades(actividades.map(a => 
         a.id === id 
@@ -781,7 +792,7 @@ export default function Actividades() {
                           const input = document.createElement('input')
                           input.type = 'file'
                           input.accept = 'image/*'
-                          input.onchange = (e) => agregarEvidencia(actividad.id, e.target.files[0])
+                          input.onchange = (e) => agregarEvidencia(actividad.id, (e.target as HTMLInputElement).files![0])
                           input.click()
                         }}
                         className="border-orange-200 text-orange-700 text-xs"
