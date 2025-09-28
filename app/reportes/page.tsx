@@ -7,19 +7,83 @@ import BackButton from "@/components/BackButton"
 import Image from "next/image"
 import { 
   BarChart3, TrendingUp, DollarSign, Calendar, 
-  AlertTriangle, Download, Filter, RefreshCw,
-  ArrowUp, ArrowDown, Eye, FileText, PieChart,
-  Map, Target, Clock, Leaf
+  AlertTriangle, Download, RefreshCw,
+  ArrowUp, ArrowDown, FileText, Target, Leaf
 } from "lucide-react"
+
+// Interfaces para los tipos de datos
+interface RendimientoItem {
+  cultivo: string;
+  rendimiento: number;
+  tendencia: string;
+  cambio: number;
+}
+
+interface HistoricoMensual {
+  mes: string;
+  produccion: number;
+  costos: number;
+  ganancias: number;
+  eficiencia: number;
+}
+
+interface AnalisisCosto {
+  cultivo: string;
+  costo: number;
+  ganancia: number;
+  roi: number;
+  rentable: boolean;
+}
+
+interface Alerta {
+  tipo: string;
+  severidad: string;
+  mensaje: string;
+  detalle: string;
+  fecha: string;
+}
+
+interface ComparativaAnual {
+  año: string;
+  rendimiento: number;
+  costos: number;
+  ganancias: number;
+}
+
+interface Recomendacion {
+  tipo: string;
+  titulo: string;
+  descripcion: string;
+  impacto: string;
+  accion: string;
+}
+
+interface Resumen {
+  cultivosActivos: number;
+  hectareasTotales: number;
+  rendimientoPromedio: number;
+  eficienciaGeneral: number;
+  gananciaTotal: number;
+  crecimiento: number;
+}
+
+interface DatosReporte {
+  rendimiento: RendimientoItem[];
+  historicoMensual: HistoricoMensual[];
+  analisisCostos: AnalisisCosto[];
+  alertas: Alerta[];
+  comparativaAnual: ComparativaAnual[];
+  recomendaciones: Recomendacion[];
+  resumen: Resumen;
+}
 
 export default function Reportes() {
   const [periodo, setPeriodo] = useState('2024')
-  const [tipoGrafica, setTipoGrafica] = useState('rendimiento')
-  const [datos, setDatos] = useState(null)
+  const [datos, setDatos] = useState<DatosReporte | null>(null) // ← CORREGIDO AQUÍ
   const [cargando, setCargando] = useState(true)
 
   // Generar datos sintéticos realistas
-  const generarDatosSinteticos = () => {
+  const generarDatosSinteticos = (): DatosReporte => { // ← Agregar tipo de retorno
     const cultivos = ['Maíz', 'Tomate', 'Papa', 'Frijol', 'Café', 'Arroz']
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     
@@ -156,7 +220,7 @@ export default function Reportes() {
     alert('📈 Exportando a Excel... (Funcionalidad simulada)')
   }
 
-  const getColorSeveridad = (severidad) => {
+  const getColorSeveridad = (severidad: string) => {
     switch (severidad) {
       case 'alta': return 'bg-red-100 text-red-800 border-red-200'
       case 'media': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
@@ -165,7 +229,7 @@ export default function Reportes() {
     }
   }
 
-  const getColorImpacto = (impacto) => {
+  const getColorImpacto = (impacto: string) => {
     switch (impacto) {
       case 'alto': return 'text-green-600'
       case 'medio': return 'text-yellow-600'
@@ -192,6 +256,11 @@ export default function Reportes() {
         </div>
       </main>
     )
+  }
+
+  // Verificar que datos no sea null
+  if (!datos) {
+    return <div>Error: No se pudieron cargar los datos</div>
   }
 
   return (
