@@ -96,7 +96,7 @@ export default function Capacitaciones() {
 
     if (cultivosGuardados) {
       const cultivos = JSON.parse(cultivosGuardados)
-      setCultivosUsuario(cultivos.map((c: any) => c.tipo?.toLowerCase() || ''))
+      setCultivosUsuario(cultivos.map((c: { tipo?: string }) => c.tipo?.toLowerCase() || ''))
     }
   }, [])
 
