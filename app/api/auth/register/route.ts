@@ -65,9 +65,10 @@ export async function POST(request: Request) {
       headers: { 'Content-Type': 'application/json' }
     })
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
     console.error('❌ Error en el registro:', error)
-    return NextResponse.json({ error: 'Error interno del servidor: ' + error.message }, {
+    return NextResponse.json({ error: 'Error interno del servidor: ' + errorMessage }, {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
