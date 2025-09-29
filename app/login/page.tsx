@@ -83,10 +83,11 @@ export default function Login() {
         setDebugInfo(`Error: ${data.error}`)
         alert(data.error || 'Error en el login')
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
       console.error('❌ Error catch:', error)
-      setDebugInfo(`Error catch: ${error.message}`)
-      alert('Error de conexión: ' + error.message)
+      setDebugInfo(`Error catch: ${errorMessage}`)
+      alert('Error de conexión: ' + errorMessage)
     } finally {
       setIsLoading(false)
       console.log('🔐 Finalizado, isLoading = false')
