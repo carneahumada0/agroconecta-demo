@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server'
 import db from '@/lib/database'
 import bcrypt from 'bcryptjs'
 
+// Agregar esta interfaz para el tipo User
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  farm_name: string;
+  password_hash: string;
+}
+
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json()
@@ -16,8 +25,8 @@ export async function POST(request: Request) {
       })
     }
 
-    // Buscar usuario por email
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
+    // Buscar usuario por email - agregar tipo User
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as User
     
     if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, {
